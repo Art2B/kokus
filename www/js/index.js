@@ -46,10 +46,12 @@ var app = {
                     break;
 
                 case "IDLE":
-                    console.log("Phone is idle");
+                    alert("Phone is idle");
                     break;
             }
         });
+        app.startWatch();
+        window.addEventListener("batterystatus", app.onBatteryStatus, false);
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
@@ -59,5 +61,18 @@ var app = {
 
         listeningElement.setAttribute('style', 'display:none;');
         receivedElement.setAttribute('style', 'display:block;');
+    },
+    startWatch: function() {
+        SMS.startWatch(function(){
+            document.addEventListener('onSMSArrive', function(e){
+                var sms = e.data;
+                alert( sms.body );
+            },function(){
+                alert("Can't start watch");
+            });
+        });
+    },
+    onBatteryStatus: function(data) {
+        alert(data.level);
     }
 };
