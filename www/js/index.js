@@ -33,7 +33,6 @@ var app = {
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicity call 'app.receivedEvent(...);'
     onDeviceReady: function() {
-        app.receivedEvent('deviceready');
         PhoneCallTrap.onCall(function(state) {
             console.log("CHANGE STATE: " + state);
 
@@ -52,15 +51,7 @@ var app = {
         });
         app.startWatch();
         window.addEventListener("batterystatus", app.onBatteryStatus, false);
-    },
-    // Update DOM on a Received Event
-    receivedEvent: function(id) {
-        var parentElement = document.getElementById(id);
-        var listeningElement = parentElement.querySelector('.listening');
-        var receivedElement = parentElement.querySelector('.received');
-
-        listeningElement.setAttribute('style', 'display:none;');
-        receivedElement.setAttribute('style', 'display:block;');
+        window.addEventListener("offline", app.onOffline, false);
     },
     startWatch: function() {
         SMS.startWatch(function(){
@@ -74,5 +65,9 @@ var app = {
     },
     onBatteryStatus: function(data) {
         alert(data.level);
+        Main.createMountain({x: 0, y: 0, z:0});
+    },
+    onOffline: function() {
+        alert("J'ai plus internet");
     }
 };

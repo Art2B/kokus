@@ -17,6 +17,7 @@
         "org.apache.cordova.geolocation",
         "io.gvox.plugin.phonecalltrap",
         "com.rjfun.cordova.sms",
-        "cordova-plugin-battery-status"
+        "cordova-plugin-battery-status",
+        "cordova-plugin-network-information"
       ]
 }
