@@ -3,4 +3,5 @@ platforms
 node_modules
 merges
 app
-kokusWorld
+kokus_world
+www/js/lib/kokus_world

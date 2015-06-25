@@ -17,8 +17,13 @@
  * under the License.
  */
 var app = {
+    kokus: null,
+    elements: [],
+    lastLevelBat: null,
+
     // Application Constructor
     initialize: function() {
+        this.kokus = new Kokus();
         this.bindEvents();
     },
     // Bind Event Listeners
@@ -33,41 +38,84 @@ var app = {
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicity call 'app.receivedEvent(...);'
     onDeviceReady: function() {
+        var _self = this;
         PhoneCallTrap.onCall(function(state) {
-            console.log("CHANGE STATE: " + state);
-
-            switch (state) {
-                case "RINGING":
-                    alert("Phone is ringing");
-                    break;
-                case "OFFHOOK":
-                    alert("Phone is off-hook");
-                    break;
-
-                case "IDLE":
-                    alert("Phone is idle");
-                    break;
-            }
+            if(state === "RINGING")
+                app.addMountain();
         });
         app.startWatch();
-        window.addEventListener("batterystatus", app.onBatteryStatus, false);
-        window.addEventListener("offline", app.onOffline, false);
+        document.addEventListener("batterystatus", function(data) {
+            if(data.level < 50 && (app.lastLevelBat === null || app.lastLevelBat >= 50))
+            app.addMountain(app);
+        }, false);
+        document.addEventListener("offline", function() {
+            app.addHouse();
+        }, false);
     },
     startWatch: function() {
+        var _self = this;
         SMS.startWatch(function(){
             document.addEventListener('onSMSArrive', function(e){
-                var sms = e.data;
-                alert( sms.body );
+                _self.addTree();
             },function(){
-                alert("Can't start watch");
+                alert("Redémarrer l'application si vous pouvez");
             });
         });
     },
     onBatteryStatus: function(data) {
-        alert(data.level);
-        Main.createMountain({x: 0, y: 0, z:0});
+        if(data.level < 50 && (this.lastLevelBat === null || this.lastLevelBat >= 50))
+            this.addMountain();
     },
-    onOffline: function() {
-        alert("J'ai plus internet");
+    addTree: function() {
+        var rotation = {};
+        rotation.x = Helpers.getRandomInt(0, 360);
+        rotation.y = Helpers.getRandomInt(0, 360);
+        rotation.z = Helpers.getRandomInt(0, 360);
+
+        var tree = new Kokus.Tree(rotation, {elements: app.elements}, app.kokus);
+        while(tree.collision())
+        {
+            rotation.x = Helpers.getRandomInt(0, 360);
+            rotation.y = Helpers.getRandomInt(0, 360);
+            rotation.z = Helpers.getRandomInt(0, 360);
+        }
+
+        app.elements.push(tree.create());
+    },
+    addMountain: function(_self) {
+        var rotation = {};
+        rotation.x = Helpers.getRandomInt(0, 360);
+        rotation.y = Helpers.getRandomInt(0, 360);
+        rotation.z = Helpers.getRandomInt(0, 360);
+
+        var mountain = new Kokus.Mountain(rotation, {elements: app.elements}, app.kokus);
+        while(mountain.collision())
+        {
+            rotation.x = Helpers.getRandomInt(0, 360);
+            rotation.y = Helpers.getRandomInt(0, 360);
+            rotation.z = Helpers.getRandomInt(0, 360);
+        }
+
+        app.elements.push(mountain.create());
+    },
+    addHouse: function() {
+        var rotation = {};
+        rotation.x = Helpers.getRandomInt(0, 360);
+        rotation.y = Helpers.getRandomInt(0, 360);
+        rotation.z = Helpers.getRandomInt(0, 360);
+     
+        var house = new Kokus.House(rotation, {elements: app.elements}, app.kokus);
+        while(house.collision())
+        {
+            rotation.x = Helpers.getRandomInt(0, 360);
+            rotation.y = Helpers.getRandomInt(0, 360);
+            rotation.z = Helpers.getRandomInt(0, 360);
+        }
+
+        app.elements.push(house.create());
+    },
+    growUp: function() {
+        if(this.elements.length % 10 && this.elements.length !== 0)
+            this.kokus.dailyEvents();
     }
 };
